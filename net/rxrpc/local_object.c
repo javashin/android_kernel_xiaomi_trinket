@@ -287,6 +287,48 @@ addr_in_use:
 }
 
 /*
+ * Get a ref on a local endpoint.
+ */
+struct rxrpc_local *rxrpc_get_local(struct rxrpc_local *local)
+{
+	const void *here = __builtin_return_address(0);
+	int n;
+
+	n = atomic_inc_return(&local->usage);
+	trace_rxrpc_local(local, rxrpc_local_got, n, here);
+	return local;
+}
+
+/*
+ * Get a ref on a local endpoint unless its usage has already reached 0.
+ */
+struct rxrpc_local *rxrpc_get_local_maybe(struct rxrpc_local *local)
+{
+	const void *here = __builtin_return_address(0);
+
+	if (local) {
+		int n = atomic_fetch_add_unless(&local->usage, 1, 0);
+		if (n > 0)
+			trace_rxrpc_local(local, rxrpc_local_got, n + 1, here);
+		else
+			local = NULL;
+	}
+	return local;
+}
+
+/*
+ * Queue a local endpoint.
+ */
+void rxrpc_queue_local(struct rxrpc_local *local)
+{
+	const void *here = __builtin_return_address(0);
+
+	if (rxrpc_queue_work(&local->processor))
+		trace_rxrpc_local(local, rxrpc_local_queued,
+				  atomic_read(&local->usage), here);
+}
+
+/*
  * A local endpoint reached its end of life.
  */
 void __rxrpc_put_local(struct rxrpc_local *local)

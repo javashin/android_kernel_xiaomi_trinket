@@ -14,6 +14,15 @@
  * than regular operations.
  */
 
+/*
+ * To ensure dependency ordering is preserved for the _relaxed and
+ * _release atomics, an smp_read_barrier_depends() is unconditionally
+ * inserted into the _relaxed variants, which are used to build the
+ * barriered versions. Avoid redundant back-to-back fences in the
+ * _acquire and _fence versions.
+ */
+#define __atomic_acquire_fence()
+#define __atomic_post_full_fence()
 
 #define ATOMIC_INIT(i)		{ (i) }
 #define ATOMIC64_INIT(i)	{ (i) }

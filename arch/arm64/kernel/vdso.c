@@ -260,7 +260,7 @@ static int vdso_setup(struct mm_struct *mm,
 
 	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);
 	if (IS_ERR_VALUE(vdso_base))
-		return PTR_ERR_OR_ZERO(ERR_PTR(vdso_base));
+		ret = ERR_PTR(vdso_base);
 
 	ret = _install_special_mapping(mm, vdso_base, PAGE_SIZE,
 				       VM_READ|VM_MAYREAD,

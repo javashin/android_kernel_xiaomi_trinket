@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2018, 2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1146,7 +1146,11 @@ static void mhi_process_cmd_completion(struct mhi_controller *mhi_cntrl,
 		chan = MHI_TRE_GET_CMD_CHID(cmd_pkt);
 		if (chan >= mhi_cntrl->max_chan) {
 			MHI_ERR("invalid channel id %u\n", chan);
+<<<<<<< HEAD
 			break;
+=======
+			goto del_ring_el;
+>>>>>>> 5ff5cde01cf82... mhi: core: Add range check for channel id received in event ring
 		}
 		mhi_chan = &mhi_cntrl->mhi_chan[chan];
 		write_lock_bh(&mhi_chan->lock);
@@ -1156,6 +1160,7 @@ static void mhi_process_cmd_completion(struct mhi_controller *mhi_cntrl,
 		break;
 	}
 
+del_ring_el:
 	mhi_del_ring_element(mhi_cntrl, mhi_ring);
 }
 

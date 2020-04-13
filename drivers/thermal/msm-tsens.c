@@ -97,9 +97,6 @@ static const struct of_device_id tsens_table[] = {
 	{	.compatible = "qcom,qcs405-tsens",
 		.data = &data_tsens14xx_405,
 	},
-	{	.compatible = "qcom,mdm9607-tsens",
-		.data = &data_tsens14xx_9607,
-	},
 	{}
 };
 MODULE_DEVICE_TABLE(of, tsens_table);

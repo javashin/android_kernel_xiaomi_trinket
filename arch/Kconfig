@@ -789,7 +789,7 @@ config HAVE_IRQ_TIME_ACCOUNTING
 	  support irq time accounting and then call enable_sched_clock_irqtime().
 
 config HAVE_MOVE_PMD
-	bool
+	def_bool y
 	help
 	  Archs that select this are able to move page tables at the PMD level.
 

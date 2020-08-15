@@ -286,6 +286,7 @@ int tsens_tm_probe(struct platform_device *pdev)
 		return rc;
 	}
 
+#ifdef CONFIG_IPC_LOGGING
 	snprintf(tsens_name, sizeof(tsens_name), "tsens_wq_%pa",
 		&tmdev->phys_addr_tm);
 
@@ -309,7 +310,6 @@ int tsens_tm_probe(struct platform_device *pdev)
 		return rc;
 	}
 
-#ifdef CONFIG_IPC_LOGGING
 	snprintf(tsens_name, sizeof(tsens_name), "tsens_%pa_0",
 					&tmdev->phys_addr_tm);
 

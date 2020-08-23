@@ -12,7 +12,7 @@ steps:
     environment: 
       TOKEN: 
         from_secret: BOT_API_KEY
-    image: azrim89/kurumi:rev1
+    image: azrim89/kurumi:rev-3
     name: azrim
     trigger: 
       branch: 

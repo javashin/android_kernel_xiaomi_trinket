@@ -6,13 +6,13 @@ name: silont-project
 steps: 
   - 
     commands:
-      - "export BOT_API_TOKEN=$BOT_API_KEY"
+      - "apt install -qqy openjdk-11-jre-headless"
       - "curl -OsSL https://github.com/azrim/script/raw/master/kernel/drone.sh"
       - "bash drone.sh"
     environment: 
       TOKEN: 
         from_secret: BOT_API_KEY
-    image: azrim89/kurumi:rev-3
+    image: fadlyas/kernel_dockerfile:latest
     name: azrim
     trigger: 
       branch: 

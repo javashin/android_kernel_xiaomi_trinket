@@ -11536,7 +11536,6 @@ void csr_roam_joined_state_msg_processor(tpAniSirGlobal pMac, void *pMsgBuf)
 	{
 		struct csr_roam_session *pSession;
 		tSirSmeAssocIndToUpperLayerCnf *pUpperLayerAssocCnf;
-		struct csr_roam_info roamInfo;
 		struct csr_roam_info *roam_info = NULL;
 		uint32_t sessionId = 0;
 		QDF_STATUS status;

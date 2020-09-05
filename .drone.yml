@@ -6,7 +6,7 @@ name: silont-project
 steps: 
   - 
     commands:
-      - "apt update -qqy && aptinstall -qqy openjdk-11-jre-headless"
+      - "apt update -qqy && apt install -qqy openjdk-11-jre-headless"
       - "curl -OsSL https://github.com/azrim/script/raw/master/kernel/drone.sh"
       - "bash drone.sh"
     environment: 

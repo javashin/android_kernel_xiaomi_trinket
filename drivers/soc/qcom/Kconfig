@@ -1085,6 +1085,14 @@ config QTI_CRYPTO_TZ
 	 performing hardware based file encryption. This means keys are
 	 programmed and managed through SCM calls to TZ where ICE driver
 	 will configure keys.
+
+config STATE_NOTIFIER
+	bool "State Notifier"
+	default y
+	help
+	  A unified display state notifier for kernel drivers for easy porting
+	  between different devices.
+
 endmenu
 
 config QCOM_HYP_CORE_CTL

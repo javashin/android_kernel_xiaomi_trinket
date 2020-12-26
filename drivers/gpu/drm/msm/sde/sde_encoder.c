@@ -2227,6 +2227,7 @@ static int _sde_encoder_resource_control_helper(struct drm_encoder *drm_enc,
 
 		/* enable all the irq */
 		_sde_encoder_irq_control(drm_enc, true);
+
 	} else {
 		/* disable all the irq */
 		_sde_encoder_irq_control(drm_enc, false);

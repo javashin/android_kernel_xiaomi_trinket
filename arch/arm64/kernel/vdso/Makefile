@@ -15,13 +15,13 @@ obj-vdso-s := $(addprefix $(obj)/, $(obj-vdso-s))
 obj-vdso-c := $(addprefix $(obj)/, $(obj-vdso-c))
 obj-vdso   := $(obj-vdso-c) $(obj-vdso-s)
 ccflags-y := -fno-stack-protector -DDISABLE_BRANCH_PROFILING -ffixed-x18
+ccflags-y += $(call cc-option, -fno-whole-program)
 ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 \
 		--hash-style=sysv --build-id -n -T
 
-
 # Force -O3 to avoid libgcc dependencies
 CFLAGS_REMOVE_vgettimeofday.o = -pg -Os
-CFLAGS_vgettimeofday.o = -O2 -fPIC -fasynchronous-unwind-tables
+CFLAGS_vgettimeofday.o = -O3 -fPIC -fasynchronous-unwind-tables
 ifneq ($(cc-name),clang)
 CFLAGS_vgettimeofday.o += -mcmodel=tiny
 endif

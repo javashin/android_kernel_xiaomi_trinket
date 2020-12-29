@@ -6,8 +6,8 @@ EXTRAVERSION =
 NAME = Petit Gorille
 
 KBUILD_CFLAGS   += -O3 $(call cc-disable-warning,maybe-uninitialized,)
-#KBUILD_CFLAGS   += $(call cc-option,-mcpu=kyro,$(call cc-option,-mcpu=cortex-a73.cortex-a53 -march=armv8-a+fp+simd+crc+crypto,-march=armv8-a+fp+simd+crc+crypto))
-KCFLAGS         += -march=armv8-a -mcpu=cortex-a53 -mtune=cortex-a53
+KBUILD_CFLAGS   += $(call cc-option,-mcpu=kyro,$(call cc-option,-mcpu=cortex-a73.cortex-a53 -march=armv8-a+fp+simd+crc+crypto,-march=armv8-a+fp+simd+crc+crypto))
+KCFLAGS         += -O3 -fno-stack-protector -march=armv8-a+fp+simd+crc+crypto -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53 -pipe
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
@@ -424,7 +424,7 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_CFLAGS   := -Wno-all -Wno-error -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar \
 		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
+		   -Wno-format-security -fno-stack-protector \
 		   -std=gnu89 -pipe
 KBUILD_CPPFLAGS := -D__KERNEL__
 KBUILD_AFLAGS_KERNEL :=

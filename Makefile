@@ -6,8 +6,10 @@ EXTRAVERSION =
 NAME = Petit Gorille
 
 KBUILD_CFLAGS   += -O3 $(call cc-disable-warning,maybe-uninitialized,)
-KBUILD_CFLAGS   += $(call cc-option,-mcpu=kyro,$(call cc-option,-mcpu=cortex-a73.cortex-a53 -march=armv8-a+fp+simd+crc+crypto,-march=armv8-a+fp+simd+crc+crypto))
-KCFLAGS         += -O3 -fno-stack-protector -march=armv8-a+fp+simd+crc+crypto -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53 -pipe
+#KCFLAGS         += -O3 -march=armv8-a -mcpu=cortex-a53 -mtune=cortex-a53
+
+#KBUILD_CFLAGS   += $(call cc-option,-mcpu=kyro,$(call cc-option,-mcpu=cortex-a73.cortex-a53 -march=armv8-a+fp+simd+crc+crypto,-march=armv8-a+fp+simd+crc+crypto))
+#KCFLAGS         += -O3 -fno-stack-protector -march=armv8-a+fp+simd+crc+crypto -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53 -pipe
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"

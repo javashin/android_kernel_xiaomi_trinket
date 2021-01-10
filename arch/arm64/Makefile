@@ -8,20 +8,30 @@
 # License.  See the file "COPYING" in the main directory of this archive
 # for more details.
 #
-# Copyright (C) 1995-2001 by Russell King ////-z norelro
+# Copyright (C) 1995-2001 by Russell King
 
-LDFLAGS_vmlinux	:=--no-undefined -X
+LDFLAGS_vmlinux	:=--no-undefined -X -z norelro
 CPPFLAGS_vmlinux.lds = -DTEXT_OFFSET=$(TEXT_OFFSET)
 GZFLAGS		:=-9
 
 ifeq ($(CONFIG_RELOCATABLE), y)
 # Pass --no-apply-dynamic-relocs to restore pre-binutils-2.27 behaviour
 # for relative relocs, since this leads to better Image compression
-# with the relocation offsets always being zero.  (*)CC=GCC(*)+(*)LD=LD.BFD(*)
+# with the relocation offsets always being zero. (*)CC=GCC(*)+(*)LD=LD.BFD(*)
+#LDFLAGS_vmlinux         += -pie -shared -Bsymbolic \
+#                        $(call ld-option, --no-apply-dynamic-relocs)
+#endif
+LDFLAGS_vmlinux		+= -Bsymbolic -z notext \
+			$(call ld-option, --no-apply-dynamic-relocs)
 
-LDFLAGS_vmlinux         += -pie -shared -Bsymbolic \
-                        $(call ld-option, --no-apply-dynamic-relocs)
+ifeq ($(ld-name),bfd)
+LDFLAGS_vmlinux		+= -shared
 endif
+ifeq ($(ld-name),lld)
+LDFLAGS_vmlinux		+= -pie
+endif
+endif
+
 
 ifeq ($(CONFIG_ARM64_ERRATUM_843419),y)
   ifeq ($(call ld-option, --fix-cortex-a53-843419),)
@@ -92,14 +102,7 @@ ifeq ($(CONFIG_COMPAT_VDSO), y)
   endif
 endif
 
-ifeq ($(cc-name),clang)
-# This is a workaround for https://bugs.llvm.org/show_bug.cgi?id=30792.
-# TODO: revert when this is fixed in LLVM.
-KBUILD_CFLAGS	+= -mno-implicit-float
-else
-KBUILD_CFLAGS	+= -mgeneral-regs-only
-endif
-KBUILD_CFLAGS	+= $(lseinstr) $(brokengasinst) $(vdso32)
+KBUILD_CFLAGS	+= -mgeneral-regs-only $(lseinstr) $(brokengasinst) $(vdso32)
 KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
 KBUILD_CFLAGS	+= $(call cc-option, -mpc-relative-literal-loads)
 KBUILD_CFLAGS	+= -fno-pic
@@ -108,14 +111,14 @@ KBUILD_AFLAGS	+= $(lseinstr) $(brokengasinst) $(vdso32)
 KBUILD_CFLAGS	+= $(call cc-option,-mabi=lp64)
 KBUILD_AFLAGS	+= $(call cc-option,-mabi=lp64)
 
-ifeq ($(CONFIG_SHADOW_CALL_STACK), y)
-KBUILD_CFLAGS	+= -ffixed-x18
-endif
-
 ifeq ($(cc-name),clang)
 KBUILD_CFLAGS	+= -DCONFIG_ARCH_SUPPORTS_INT128
 else
 KBUILD_CFLAGS	+= $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
+endif
+
+ifeq ($(CONFIG_SHADOW_CALL_STACK), y)
+KBUILD_CFLAGS	+= -ffixed-x18
 endif
 
 ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)

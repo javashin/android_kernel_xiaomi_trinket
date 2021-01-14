@@ -293,11 +293,20 @@ static inline u32 stmmac_rx_dirty(struct stmmac_priv *priv, u32 queue)
  */
 static inline void stmmac_hw_fix_mac_speed(struct stmmac_priv *priv)
 {
-	struct net_device *ndev = priv->dev;
-	struct phy_device *phydev = ndev->phydev;
+	if (likely(priv->plat->fix_mac_speed)) {
+		if (priv->plat->mac2mac_en) {
+			priv->plat->fix_mac_speed(priv->plat->bsp_priv,
+					priv->speed);
+			return;
+		}
 
-	if (likely(priv->plat->fix_mac_speed))
-		priv->plat->fix_mac_speed(priv->plat->bsp_priv, phydev->speed);
+		if (priv->phydev->link)
+			priv->plat->fix_mac_speed(priv->plat->bsp_priv,
+						  priv->speed);
+		else
+			priv->plat->fix_mac_speed(priv->plat->bsp_priv,
+						  SPEED_10);
+	}
 }
 
 /**
@@ -864,6 +873,22 @@ static void stmmac_adjust_link(struct net_device *dev)
 
 	mutex_unlock(&priv->lock);
 
+	if (new_state) {
+		if (phydev->link == 1 && priv->hw_offload_enabled)
+			ethqos_ipa_offload_event_handler(priv,
+							 EV_PHY_LINK_UP);
+		else if (phydev->link == 0 &&
+			 priv->hw_offload_enabled)
+			ethqos_ipa_offload_event_handler(priv,
+							 EV_PHY_LINK_DOWN);
+	}
+#ifdef CONFIG_MSM_BOOT_TIME_MARKER
+if (phydev->link == 1 && !priv->boot_kpi) {
+	place_marker("M - Ethernet is Ready.Link is UP");
+	priv->boot_kpi = true;
+}
+#endif
+
 	if (phydev->is_pseudo_fixed_link)
 		/* Stop PHY layer to call the hook to adjust the link in case
 		 * of a switch is attached to the stmmac driver.
@@ -981,6 +1006,28 @@ static int stmmac_init_phy(struct net_device *dev)
 	if (phydev->is_pseudo_fixed_link)
 		phydev->irq = PHY_POLL;
 
+	if (((phydev->phy_id & phydev->drv->phy_id_mask) == MICREL_PHY_ID) &&
+	    !priv->plat->phy_intr_en) {
+		ret = ethqos_phy_intr_enable(priv);
+		if (ret)
+			pr_alert("qcom-ethqos: Unable to enable PHY interrupt\n");
+		else
+			priv->plat->phy_intr_en = true;
+	}
+
+	if (phy_intr_en) {
+		phydev->irq = PHY_IGNORE_INTERRUPT;
+		phydev->interrupts =  PHY_INTERRUPT_ENABLED;
+		if (phydev->drv->config_intr &&
+		    !phydev->drv->config_intr(phydev)) {
+			pr_debug(" qcom-ethqos: %s config_phy_intr successful\n",
+				 __func__);
+			qcom_ethqos_request_phy_wol(priv->plat);
+		} else {
+			pr_alert("Unable to register PHY IRQ\n");
+			phydev->irq = PHY_POLL;
+		}
+	}
 	phy_attached_info(phydev);
 	return 0;
 }

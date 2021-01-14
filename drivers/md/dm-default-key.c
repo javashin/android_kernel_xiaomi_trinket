@@ -52,6 +52,7 @@ struct default_key_c {
 	struct blk_crypto_key key;
 	bool is_hw_wrapped;
 	u64 max_dun;
+	bool set_dun;
 };
 
 static const struct dm_default_key_cipher *

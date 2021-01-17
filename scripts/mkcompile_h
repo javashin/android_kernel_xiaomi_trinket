@@ -78,7 +78,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   echo \#define LINUX_COMPILE_BY \"`echo JavaShin-X | $UTS_TRUNCATE`\"
   echo \#define LINUX_COMPILE_HOST \"`echo WrongDevice | $UTS_TRUNCATE`\"
 
-  CC_VERSION="Proton clang version 12.0.0 (20210109)"
+  CC_VERSION="Proton clang version 12.0.0 (20210116)"
   LD_VERSION="LLD 12.0.0 (compatible with GNU linkers)"
   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
 ) > .tmpcompile

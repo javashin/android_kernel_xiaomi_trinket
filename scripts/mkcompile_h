@@ -78,11 +78,16 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   echo \#define LINUX_COMPILE_BY \"`echo JavaShin-X | $UTS_TRUNCATE`\"
   echo \#define LINUX_COMPILE_HOST \"`echo WrongDevice | $UTS_TRUNCATE`\"
 
-  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
-  LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
-		      | sed 's/[[:space:]]*$//')
+  CC_VERSION="Proton clang version 12.0.0 (20210123)"
+  LD_VERSION="GNU ld (MoonBase ToolChain 2.36.50.20210124)"
   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
 ) > .tmpcompile
+
+#  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
+#  LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
+#		      | sed 's/[[:space:]]*$//')
+#  printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
+#) > .tmpcompile
 
 # Only replace the real compile.h if the new one is different,
 # in order to preserve the timestamp and avoid unnecessary

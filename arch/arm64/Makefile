@@ -10,7 +10,7 @@
 #
 # Copyright (C) 1995-2001 by Russell King
 
-LDFLAGS_vmlinux	:=--no-undefined -X -z norelro
+LDFLAGS_vmlinux	:=--no-undefined -X
 CPPFLAGS_vmlinux.lds = -DTEXT_OFFSET=$(TEXT_OFFSET)
 GZFLAGS		:=-9
 
@@ -18,20 +18,9 @@ ifeq ($(CONFIG_RELOCATABLE), y)
 # Pass --no-apply-dynamic-relocs to restore pre-binutils-2.27 behaviour
 # for relative relocs, since this leads to better Image compression
 # with the relocation offsets always being zero. (*)CC=GCC(*)+(*)LD=LD.BFD(*)
-#LDFLAGS_vmlinux         += -pie -shared -Bsymbolic \
-#                        $(call ld-option, --no-apply-dynamic-relocs)
-#endif
-LDFLAGS_vmlinux		+= -Bsymbolic -z notext \
-			$(call ld-option, --no-apply-dynamic-relocs)
-
-ifeq ($(ld-name),bfd)
-LDFLAGS_vmlinux		+= -shared
+LDFLAGS_vmlinux         += -pie -shared -Bsymbolic \
+                        $(call ld-option, --no-apply-dynamic-relocs)
 endif
-ifeq ($(ld-name),lld)
-LDFLAGS_vmlinux		+= -pie
-endif
-endif
-
 
 ifeq ($(CONFIG_ARM64_ERRATUM_843419),y)
   ifeq ($(call ld-option, --fix-cortex-a53-843419),)

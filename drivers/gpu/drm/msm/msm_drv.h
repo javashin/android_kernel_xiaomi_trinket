@@ -74,6 +74,8 @@ struct msm_gem_vma;
 #define MAX_CONNECTORS 16
 
 #define TEARDOWN_DEADLOCK_RETRY_MAX 5
+extern atomic_t resume_pending;
+extern wait_queue_head_t resume_wait_q;
 
 extern atomic_t resume_pending;
 extern wait_queue_head_t resume_wait_q;

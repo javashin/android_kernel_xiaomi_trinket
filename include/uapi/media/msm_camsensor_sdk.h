@@ -56,12 +56,18 @@
 
 #define SECURE_CAM_RST_MODULES
 
+//Switch for virtual camera
+#define VIRTUAL_CAMERA
+
 enum msm_sensor_camera_id_t {
 	CAMERA_0,
 	CAMERA_1,
 	CAMERA_2,
 	CAMERA_3,
 	CAMERA_4,
+#ifdef VIRTUAL_CAMERA
+	CAMERA_5,
+#endif
 	MAX_CAMERAS,
 };
 
@@ -76,10 +82,10 @@ enum i2c_freq_mode_t {
 enum camb_position_t {
 	BACK_CAMERA_B,
 	FRONT_CAMERA_B,
-	AUX_CAMERA_G_B = 0x110,
-	AUX_CAMERA_W_B = 0x120,
+	AUX_CAMERA_G_B = 0x110, //for wide camera
+	AUX_CAMERA_W_B = 0x120,//for micro camera
 	AUX_CAMERA_B = 0x100,
-	AUX_CAMERA_FRONT_B = 0x101,
+	AUX_CAMERA_FRONT_B = 0x101,//for front aux camera
 	INVALID_CAMERA_B,
 };
 
@@ -310,6 +316,12 @@ struct msm_camera_i2c_reg_setting {
 	unsigned short delay;
 };
 
+struct msm_sensor_id_info_t {
+	unsigned short sensor_id_reg_addr;
+	unsigned short sensor_id;
+	unsigned short sensor_id_mask;
+	struct msm_camera_i2c_reg_setting setting;
+};
 enum msm_cci_i2c_master_t {
 	MSM_MASTER_0,
 	MSM_MASTER_1,
@@ -323,13 +335,6 @@ struct msm_vendor_id_info_t {
 	unsigned short vendor_id;
 	enum msm_camera_i2c_data_type data_type;
 	enum msm_cci_i2c_master_t cci_i2c_master;
-};
-
-struct msm_sensor_id_info_t {
-	unsigned short sensor_id_reg_addr;
-	unsigned short sensor_id;
-	unsigned short sensor_id_mask;
-	struct msm_camera_i2c_reg_setting setting;
 };
 
 struct msm_camera_sensor_slave_info {

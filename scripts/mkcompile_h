@@ -78,8 +78,8 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   echo \#define LINUX_COMPILE_BY \"`echo JavaShin-X | $UTS_TRUNCATE`\"
   echo \#define LINUX_COMPILE_HOST \"`echo WrongDevice | $UTS_TRUNCATE`\"
 
-  CC_VERSION="MoonBase Gnu/gcc version 11.0.0"
-  LD_VERSION="Gnu/LD.BFD 2.36"
+  CC_VERSION="MoonBase Android-ToolChain Gnu/gcc 11.0.0"
+  LD_VERSION="Gnu/binutils ld.bfd 2.36.1"
   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
 ) > .tmpcompile
 

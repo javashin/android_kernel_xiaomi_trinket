@@ -1,4 +1,5 @@
 /* Copyright (c) 2016-2019, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -319,7 +320,7 @@ static void msm_vfe48_set_bus_err_ign_mask(struct vfe_device *vfe_dev,
 void msm_vfe48_stats_cfg_ub(struct vfe_device *vfe_dev)
 {
 	int i;
-	uint32_t ub_offset = 0, stats_burst_len;
+	uint32_t ub_offset = 0, stats_burst_len = 0;
 	uint32_t ub_size[VFE47_NUM_STATS_TYPE] = {
 		80, /* MSM_ISP_STATS_HDR_BE */
 		64, /* MSM_ISP_STATS_BG */
@@ -329,10 +330,10 @@ void msm_vfe48_stats_cfg_ub(struct vfe_device *vfe_dev)
 		64, /* MSM_ISP_STATS_CS */
 		64, /* MSM_ISP_STATS_IHIST */
 		64, /* MSM_ISP_STATS_BHIST */
-		64, /* MSM_ISP_STATS_AEC_BG */
-	};
+		80, /* MSM_ISP_STATS_AEC_BG */
+ 	};
 
-	stats_burst_len = VFE48_STATS_BURST_LEN;
+ 	stats_burst_len = VFE48_STATS_BURST_LEN;
 	ub_offset = VFE48_UB_SIZE_VFE;
 
 	for (i = 0; i < VFE47_NUM_STATS_TYPE; i++) {

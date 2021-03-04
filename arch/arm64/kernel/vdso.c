@@ -260,7 +260,7 @@ static int vdso_setup(struct mm_struct *mm,
 
 	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);
 	if (IS_ERR_VALUE(vdso_base))
-		return PTR_ERR_OR_ZERO(ERR_PTR(vdso_base));
+		ret = ERR_PTR(vdso_base);
 
 	ret = _install_special_mapping(mm, vdso_base, PAGE_SIZE,
 				       VM_READ|VM_MAYREAD,
@@ -337,9 +337,6 @@ void update_vsyscall(struct timekeeper *tk)
 							tk->tkr_mono.shift;
 	vdso_data->wtm_clock_sec		= tk->wall_to_monotonic.tv_sec;
 	vdso_data->wtm_clock_nsec		= tk->wall_to_monotonic.tv_nsec;
-
-	/* Read without the seqlock held by clock_getres() */
-	WRITE_ONCE(vdso_data->hrtimer_res, hrtimer_resolution);
 
 	if (!use_syscall) {
 		struct timespec btm = ktime_to_timespec(tk->offs_boot);

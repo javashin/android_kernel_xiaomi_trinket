@@ -711,7 +711,6 @@ KBUILD_CFLAGS   += -O3
 ifeq ($(cc-name),clang)
 KBUILD_CFLAGS	+= -O3
 KBUILD_CFLAGS	+= -mllvm -polly \
-		   -mllvm -polly-run-dce \
 		   -mllvm -polly-run-inliner \
 		   -mllvm -polly-opt-fusion=max \
 		   -mllvm -polly-ast-use-context \

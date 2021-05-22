@@ -2627,6 +2627,15 @@ static void __maybe_unused dwc3_gadget_set_speed(struct usb_gadget *g,
 	reg &= ~(DWC3_DCFG_SPEED_MASK);
 
 	/*
+	 * Ideally, dwc3_reset_gadget() would trigger the function
+	 * drivers to stop any active transfers through ep disable.
+	 * However, for functions which defer ep disable, such as mass
+	 * storage, we will need to rely on the call to stop active
+	 * transfers here, and avoid allowing of request queuing.
+	 */
+	dwc->connected = false;
+
+	/*
 	 * WORKAROUND: DWC3 revision < 2.20a have an issue
 	 * which would cause metastability state on Run/Stop
 	 * bit if we try to force the IP to USB2-only mode.

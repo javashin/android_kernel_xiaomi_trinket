@@ -3512,12 +3512,6 @@ int usb_port_resume(struct usb_device *udev, pm_message_t msg)
 		 * sequence.
 		 */
 		status = hub_port_status(hub, port1, &portstatus, &portchange);
-<<<<<<< HEAD
-
-		/* TRSMRCY = 10 msec */
-		usleep_range(10000, 10500);
-=======
->>>>>>> b62f1b7e9bad6c799ae574b260440c3e65d3ae9a
 	}
 
  SuspendCleared:

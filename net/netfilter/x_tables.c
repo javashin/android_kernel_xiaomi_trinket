@@ -1239,9 +1239,23 @@ xt_replace_table(struct xt_table *table,
 	}
 
 	newinfo->initial_entries = private->initial_entries;
+	/*
+	 * Ensure contents of newinfo are visible before assigning to
+	 * private.
+	 */
+	smp_wmb();
+	table->private = newinfo;
 
-	rcu_assign_pointer(table->private, newinfo);
-	synchronize_rcu();
+	/* make sure all cpus see new ->private value */
+	smp_mb();
+
+	/*
+	 * Even though table entries have now been swapped, other CPU's
+	 * may still be using the old entries. This is okay, because
+	 * resynchronization happens because of the locking done
+	 * during the get_counters() routine.
+	 */
+	local_bh_enable();
 
 #ifdef CONFIG_AUDIT
 	if (audit_enabled) {

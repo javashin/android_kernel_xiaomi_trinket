@@ -1240,6 +1240,12 @@ config CC_OPTIMIZE_FOR_SIZE
 
 endchoice
 
+config LTO_GCC
+	bool "Enable Link Time Optimization for GCC"
+
+config GCC_GRAPHITE
+        bool "Enable GCC Polyhedral Loop Optimization (Graphite)"
+
 config HAVE_LD_DEAD_CODE_DATA_ELIMINATION
 	bool
 	help
@@ -1265,9 +1271,6 @@ config LD_DEAD_CODE_DATA_ELIMINATION
 	  silently broken kernel if the required annotations are not
 	  present. This option is not well tested yet, so use at your
 	  own risk.
-
-config LTO_GCC
-	bool "Enable Link Time Optimization for GCC"
 
 config SYSCTL
 	bool

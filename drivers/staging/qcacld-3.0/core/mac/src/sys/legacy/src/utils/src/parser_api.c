@@ -3026,7 +3026,6 @@ QDF_STATUS wlan_parse_ftie_sha384(uint8_t *frame, uint32_t frame_len,
 		}
 
 		remaining_ie_len -= (len + 2);
-
 		switch (id) {
 		case FTIE_SUBELEM_R1KH_ID:
 			if (len != FTIE_R1KH_LEN) {

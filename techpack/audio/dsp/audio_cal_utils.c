@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2014-2019, 2021 The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -19,7 +19,6 @@
 #include <dsp/audio_cal_utils.h>
 
 struct mutex cal_lock;
-
 static int unmap_memory(struct cal_type_data *cal_type,
 			struct cal_block_data *cal_block);
 

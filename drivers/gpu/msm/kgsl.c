@@ -1027,13 +1027,6 @@ static struct kgsl_process_private *kgsl_process_private_new(
 	struct kgsl_process_private *private;
 	struct pid *cur_pid = get_task_pid(current->group_leader, PIDTYPE_PID);
 
-	/*
-	 * Flush mem_workqueue to make sure that any lingering
-	 * structs (process pagetable etc) are released before
-	 * starting over again.
-	 */
-	flush_workqueue(kgsl_driver.mem_workqueue);
-
 	/* Search in the process list */
 	list_for_each_entry(private, &kgsl_driver.process_list, list) {
 		if (private->pid == cur_pid) {
@@ -2419,12 +2412,7 @@ static int kgsl_setup_anon_useraddr(struct kgsl_pagetable *pagetable,
 		entry->memdesc.gpuaddr = (uint64_t) hostptr;
 	}
 
-	ret = memdesc_sg_virt(&entry->memdesc, hostptr);
-
-	if (ret && kgsl_memdesc_use_cpu_map(&entry->memdesc))
-		kgsl_mmu_put_gpuaddr(&entry->memdesc);
-
-	return ret;
+	return memdesc_sg_virt(&entry->memdesc, hostptr);
 }
 
 #ifdef CONFIG_DMA_SHARED_BUFFER

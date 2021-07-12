@@ -429,6 +429,15 @@ KBUILD_CFLAGS   := -O3 -Wno-all -Wno-error -Wundef -Wstrict-prototypes -Wno-trig
 		   -Wno-format-security -fno-stack-protector \
 		   -std=gnu89
 KBUILD_CPPFLAGS := -D__KERNEL__
+
+ifeq ($(CONFIG_AUTO_AIS),true)
+KBUILD_CFLAGS    += -DCONFIG_AIS_SERVICES
+endif
+
+#ifeq ($(CONFIG_EARLY_INIT),true)
+#KBUILD_CFLAGS    += -DCONFIG_EARLY_SERVICES
+#endif
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS_MODULE  := -DMODULE

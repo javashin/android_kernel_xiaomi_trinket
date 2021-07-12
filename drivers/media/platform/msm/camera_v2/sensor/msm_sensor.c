@@ -576,6 +576,20 @@ static int msm_sensor_get_af_status(struct msm_sensor_ctrl_t *s_ctrl,
 	return 0;
 }
 
+static int32_t msm_sensor_get_subdev_id(
+    struct msm_sensor_ctrl_t *s_ctrl, void *arg)
+{
+    uint32_t *subdev_id = (uint32_t *)arg;
+
+    if (!subdev_id) {
+        pr_err("%s:%d failed\n", __func__, __LINE__);
+        return -EINVAL;
+    }
+    *subdev_id = s_ctrl->id;
+    pr_debug("%s:%d subdev_id %d\n", __func__, __LINE__, *subdev_id);
+    return 0;
+}
+
 static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 			unsigned int cmd, void *arg)
 {
@@ -588,6 +602,32 @@ static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 		return -EBADF;
 	}
 	switch (cmd) {
+	case VIDIOC_MSM_SENSOR_GET_SUBDEV_ID:
+		rc = msm_sensor_get_subdev_id(s_ctrl, arg);
+		return rc;
+#ifdef CONFIG_AIS_SERVICES
+    case VIDIOC_MSM_SENSOR_INIT_CFG:
+#ifdef CONFIG_COMPAT
+    case VIDIOC_MSM_SENSOR_INIT_CFG32:
+		if (is_compat_task()) {
+            struct sensor_init_cfg_data32 *u32 =
+                (struct sensor_init_cfg_data32 *)argp;
+            struct sensor_init_cfg_data sensor_init_data;
+
+            memset(&sensor_init_data, 0, sizeof(sensor_init_data));
+            sensor_init_data.cfgtype = u32->cfgtype;
+            sensor_init_data.cfg.setting = compat_ptr(u32->cfg.
+                            setting);
+            cmd = VIDIOC_MSM_SENSOR_INIT_CFG;
+            rc = msm_sensor_driver_cmd(&s_ctrl->s_init,
+                &sensor_init_data);
+        } else
+#endif
+        {
+            rc = msm_sensor_driver_cmd(&s_ctrl->s_init, argp);
+        }
+        return rc;
+#endif
 	case VIDIOC_MSM_SENSOR_CFG:
 #ifdef CONFIG_COMPAT
 		if (is_compat_task())

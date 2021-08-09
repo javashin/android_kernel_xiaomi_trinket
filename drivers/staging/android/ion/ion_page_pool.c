@@ -14,7 +14,12 @@
  *
  */
 
+#include <linux/debugfs.h>
+#include <linux/dma-mapping.h>
+#include <linux/err.h>
+#include <linux/fs.h>
 #include <linux/list.h>
+#include <linux/init.h>
 #include <linux/slab.h>
 #include <linux/swap.h>
 #include <linux/sched/signal.h>
@@ -28,30 +33,11 @@
  */
 static long nr_total_pages;
 
-/* do a simple check to see if we are in any low memory situation */
-static bool pool_refill_ok(struct ion_page_pool *pool)
+static void *ion_page_pool_alloc_pages(struct ion_page_pool *pool)
 {
-	struct zonelist *zonelist;
-	struct zoneref *z;
-	struct zone *zone;
-	int mark;
-	int classzone_idx = (int)gfp_zone(pool->gfp_mask);
+	struct page *page = alloc_pages(pool->gfp_mask, pool->order);
 
-	zonelist = node_zonelist(numa_node_id(), pool->gfp_mask);
-	for_each_zone_zonelist(zone, z, zonelist, classzone_idx) {
-		mark = high_wmark_pages(zone);
-		if (!zone_watermark_ok_safe(zone, 0, mark, classzone_idx))
-			return false;
-	}
-
-	return true;
-}
-
-static inline struct page *ion_page_pool_alloc_pages(struct ion_page_pool *pool)
-{
-	if (fatal_signal_pending(current))
-		return NULL;
-	return alloc_pages(pool->gfp_mask, pool->order);
+	return page;
 }
 
 static void ion_page_pool_free_pages(struct ion_page_pool *pool,
@@ -60,7 +46,7 @@ static void ion_page_pool_free_pages(struct ion_page_pool *pool,
 	__free_pages(page, pool->order);
 }
 
-static void ion_page_pool_add(struct ion_page_pool *pool, struct page *page)
+static int ion_page_pool_add(struct ion_page_pool *pool, struct page *page)
 {
 	spin_lock(&pool->lock);
 	if (PageHighMem(page)) {
@@ -71,7 +57,6 @@ static void ion_page_pool_add(struct ion_page_pool *pool, struct page *page)
 		pool->low_count++;
 	}
 
-	atomic_inc(&pool->count);
 	nr_total_pages += 1 << pool->order;
 	mod_node_page_state(page_pgdat(page), NR_KERNEL_MISC_RECLAIMABLE,
 							1 << pool->order);
@@ -93,7 +78,6 @@ static struct page *ion_page_pool_remove(struct ion_page_pool *pool, bool high)
 		pool->low_count--;
 	}
 
-	atomic_dec(&pool->count);
 	list_del(&page->lru);
 	nr_total_pages -= 1 << pool->order;
 	mod_node_page_state(page_pgdat(page), NR_KERNEL_MISC_RECLAIMABLE,
@@ -152,7 +136,11 @@ struct page *ion_page_pool_alloc_pool_only(struct ion_page_pool *pool)
 
 void ion_page_pool_free(struct ion_page_pool *pool, struct page *page)
 {
-	ion_page_pool_add(pool, page);
+	int ret;
+
+	ret = ion_page_pool_add(pool, page);
+	if (ret)
+		ion_page_pool_free_pages(pool, page);
 }
 
 void ion_page_pool_free_immediate(struct ion_page_pool *pool, struct page *page)
@@ -217,10 +205,12 @@ int ion_page_pool_shrink(struct ion_page_pool *pool, gfp_t gfp_mask,
 struct ion_page_pool *ion_page_pool_create(gfp_t gfp_mask, unsigned int order,
 					   bool cached)
 {
-	struct ion_page_pool *pool = kzalloc(sizeof(*pool), GFP_KERNEL);
+	struct ion_page_pool *pool = kmalloc(sizeof(*pool), GFP_KERNEL);
 
 	if (!pool)
 		return NULL;
+	pool->high_count = 0;
+	pool->low_count = 0;
 	INIT_LIST_HEAD(&pool->low_items);
 	INIT_LIST_HEAD(&pool->high_items);
 	pool->gfp_mask = gfp_mask;
@@ -237,3 +227,9 @@ void ion_page_pool_destroy(struct ion_page_pool *pool)
 {
 	kfree(pool);
 }
+
+static int __init ion_page_pool_init(void)
+{
+	return 0;
+}
+device_initcall(ion_page_pool_init);
